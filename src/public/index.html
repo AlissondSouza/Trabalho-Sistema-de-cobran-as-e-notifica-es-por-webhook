@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Operations</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar" id="sidebar" aria-label="Navegação principal">
+        <a class="logo" href="#overview">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 30 16 16 30 2 16Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 9v14M9 16h14" stroke="currentColor" stroke-width="2"/><rect x="13.5" y="13.5" width="5" height="5" fill="currentColor"/></svg>
+            <span class="logo-text"><b>PAYMENT</b> OPERATIONS<small>UNIDADE DE DEMONSTRAÇÃO</small></span>
+        </a>
+        <nav>
+            <p class="nav-group">Operações</p>
+            <a href="#overview" data-view="overview"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z"/></svg><span>Visão geral</span></a>
+            <a href="#criar" data-view="criar"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2h12v12H2zM8 5v6M5 8h6"/></svg><span>Criar pagamento</span></a>
+            <a href="#pagamentos" data-view="pagamentos"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 3h12M2 8h12M2 13h12"/></svg><span>Pagamentos</span></a>
+            <p class="nav-group">Sistema</p>
+            <a href="#monitor" data-view="monitor"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h3l2-5 3 10 2-5h4"/></svg><span>Monitor de webhook</span></a>
+            <a href="#sistema" data-view="sistema"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 3h12v4H2zM2 9h12v4H2zM4.5 5h1M4.5 11h1"/></svg><span>Status do sistema</span></a>
+        </nav>
+        <p class="sidebar-foot"><b>SIMULAÇÃO</b><span>Ambiente educacional. Nenhum pagamento real é processado.</span></p>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+
+    <div class="main">
+        <header class="topbar">
+            <button class="icon-btn" id="menu-btn" type="button" aria-label="Abrir ou recolher o menu" aria-controls="sidebar">
+                <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg>
+            </button>
+            <div class="title">
+                <p class="crumb">PAYMENT OPERATIONS <span>/</span> <span id="crumb"></span></p>
+                <h1 id="page-title"></h1>
+            </div>
+            <div class="indicators" id="indicators" aria-live="polite"></div>
+            <time class="clock" id="clock"></time>
+        </header>
+
+        <main>
+            <!-- VISÃO GERAL -->
+            <section id="view-overview" class="view" hidden>
+                <p class="section-label">Estatísticas operacionais</p>
+                <div class="stats" id="stats"></div>
+                <p class="section-label">Resumo financeiro</p>
+                <div class="stats finance" id="finance"></div>
+                <div class="grid-2">
+                    <div class="panel"><h2>Últimos pagamentos criados</h2><div id="recent-created"></div></div>
+                    <div class="panel"><h2>Mudanças de status recentes</h2><div id="recent-updated"></div></div>
+                    <div class="panel"><h2>Últimos eventos de webhook</h2><div id="recent-events"></div></div>
+                    <div class="panel"><h2>Monitoramento do sistema</h2><div id="overview-system"></div></div>
+                </div>
+            </section>
+
+            <!-- CRIAR PAGAMENTO -->
+            <section id="view-criar" class="view" hidden>
+                <div class="grid-2">
+                    <div class="panel">
+                        <h2>Nova cobrança de demonstração</h2>
+                        <form id="payment-form" novalidate>
+                            <label for="cliente">Nome do cliente</label>
+                            <input type="text" id="cliente" name="cliente" maxlength="255" autocomplete="name" placeholder="Ex: Ana Silva" required>
+                            <label for="valor">Valor em reais</label>
+                            <input type="number" id="valor" name="valor" min="0.01" step="0.01" placeholder="50,00" required>
+                            <p class="field-error" id="form-error" role="alert"></p>
+                            <button class="btn primary" id="create-button" type="submit">Gerar cobrança</button>
+                        </form>
+                    </div>
+                    <div class="panel" id="created-panel">
+                        <h2>Cobrança registrada</h2>
+                        <div id="created"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGAMENTOS -->
+            <section id="view-pagamentos" class="view" hidden>
+                <div class="panel">
+                    <div class="toolbar">
+                        <div class="tabs" id="filters" role="group" aria-label="Filtrar por status"></div>
+                        <div class="search">
+                            <label for="search" class="sr-only">Buscar por cliente ou identificador</label>
+                            <input type="search" id="search" placeholder="Buscar cliente ou ID">
+                        </div>
+                        <button class="btn" id="refresh-button" type="button">Atualizar</button>
+                    </div>
+                    <p class="meta" id="list-meta"></p>
+                    <div id="list"></div>
+                </div>
+            </section>
+
+            <!-- MONITOR DE WEBHOOK -->
+            <section id="view-monitor" class="view" hidden>
+                <div class="grid-2 monitor">
+                    <div class="panel sim">
+                        <p class="tag">Demonstração / Simulação</p>
+                        <h2>Disparar notificação</h2>
+                        <p class="meta">As notificações são simuladas e enviadas ao endpoint <code>/webhook/pagamento</code>. Nenhuma transação financeira ocorre.</p>
+                        <label for="sim-payment">Pagamento</label>
+                        <select id="sim-payment"></select>
+                        <label for="sim-status">Novo status</label>
+                        <select id="sim-status">
+                            <option value="approved">Aprovado</option>
+                            <option value="rejected">Rejeitado</option>
+                            <option value="cancelled">Cancelado</option>
+                        </select>
+                        <div class="actions">
+                            <button class="btn primary" id="sim-send" type="button">Enviar notificação</button>
+                            <button class="btn" id="sim-repeat" type="button" disabled>Reenviar último evento</button>
+                            <button class="btn" id="sim-token" type="button">Testar token inválido</button>
+                        </div>
+                        <div id="sim-result"></div>
+                    </div>
+                    <div class="panel">
+                        <h2>Registro da sessão</h2>
+                        <p class="meta">Respostas reais do servidor às notificações enviadas por esta tela. Duplicados e erros de autenticação não são gravados no banco, por isso só aparecem aqui até a página ser recarregada.</p>
+                        <ol class="timeline" id="session-log"></ol>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h2>Eventos processados (MySQL)</h2>
+                    <p class="meta">Histórico da tabela <code>eventos_webhook</code>. O status anterior não é armazenado pelo sistema.</p>
+                    <div id="event-history"></div>
+                </div>
+            </section>
+
+            <!-- STATUS DO SISTEMA -->
+            <section id="view-sistema" class="view" hidden>
+                <div class="stats system" id="system-cards"></div>
+                <div class="panel">
+                    <div class="toolbar"><p class="meta" id="system-meta"></p><button class="btn" id="system-refresh" type="button">Verificar agora</button></div>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<dialog id="modal" aria-labelledby="modal-title">
+    <div class="modal-head"><h2 id="modal-title">Detalhes do pagamento</h2><button class="icon-btn" id="modal-close" type="button" aria-label="Fechar">✕</button></div>
+    <div id="modal-body"></div>
+</dialog>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+<script src="app.js"></script>
+</body>
+</html>
